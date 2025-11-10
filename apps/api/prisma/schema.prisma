@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Vendor {
+  id         String    @id @default(cuid())
+  name       String    @unique
+  taxId      String?
+  address    String?
+  createdAt  DateTime  @default(now())
+  invoices   Invoice[]
+}
+
+model Document {
+  id            String   @id
+  name          String?
+  filePath      String?
+  fileType      String?
+  status        String?
+  organizationId String?
+  departmentId   String?
+  processedAt   DateTime?
+  analyticsId   String?
+  metadataJson  Json?
+  // 👇 one-to-one relation
+  invoice       Invoice?
+}
+
+model Invoice {
+  id             String     @id @default(cuid())
+  vendorId       String?    
+  vendor         Vendor?    @relation(fields: [vendorId], references: [id])
+  documentId     String?    @unique   // ✅ make unique
+  document       Document?  @relation(fields: [documentId], references: [id])
+  invoiceNumber  String?
+  invoiceDate    DateTime?
+  deliveryDate   DateTime?
+  documentType   String?
+  subTotal       Float?
+  totalTax       Float?
+  invoiceTotal   Float?
+  currencySymbol String?
+  payments       Payment[]
+  lineItems      LineItem[]
+  createdAt      DateTime   @default(now())
+}
+
+
+model LineItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  srNo        Int?
+  description String?
+  quantity    Float?
+  unitPrice   Float?
+  totalPrice  Float?
+  vatAmount   Float?
+  vatRate     Float?
+  sachkonto   String?
+  busKey      String?
+}
+
+model Payment {
+  id            String   @id @default(cuid())
+  invoiceId     String?
+  invoice       Invoice? @relation(fields: [invoiceId], references: [id])
+  bankAccount   String?
+  bic           String?
+  accountName   String?
+  dueDate       DateTime?
+  netDays       Int?
+  discountedTotal Float?
+  createdAt     DateTime @default(now())
+}

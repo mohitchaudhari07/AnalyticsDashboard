@@ -1,0 +1,17 @@
+{
+  "name": "analytics-dashboard",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "services/*"
+  ],
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "turbo": "^2.1.0",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build"
+  }
+}
